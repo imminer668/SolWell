@@ -2,19 +2,27 @@
 import { useRouter } from 'next/navigation';
 import BottomNavigation from '../components/BottomNavigation';
 import { useWallet } from '../contexts/WalletContext';
+import WalletDropdown from '../components/WalletDropdown';
 
 export default function Profile() {
   const router = useRouter();
-  const { walletAddress } = useWallet();
+  const { walletAddress, formatWalletAddress, balance } = useWallet();
   
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 pb-20">
       {/* Top Navigation */}
       <div className="p-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-black">Profile</h1>
-        <button className="rounded-full bg-gray-100 p-2">
-          <i className="fas fa-cog text-black"></i>
-        </button>
+        {walletAddress ? (
+          <WalletDropdown />
+        ) : (
+          <button 
+            className="rounded-full bg-purple-100 p-2 hover:bg-purple-200 transition-colors duration-300"
+            onClick={() => router.push('/')}
+          >
+            <i className="fas fa-wallet text-black"></i>
+          </button>
+        )}
       </div>
       
       {/* User Info */}
@@ -24,14 +32,28 @@ export default function Profile() {
             <i className="fas fa-user text-white text-2xl"></i>
           </div>
           <div>
-            <h2 className="text-black font-bold text-xl">{walletAddress ? walletAddress : 'Not Connected'}</h2>
+            <h2 className="text-black font-bold text-xl">
+              {walletAddress ? 'Solana User' : 'Not Connected'}
+            </h2>
             <div className="flex items-center mt-1">
-              <div className="bg-gray-100 rounded-full px-2 py-1 text-xs text-black mr-2 flex items-center">
-                <i className="fas fa-wallet text-purple-500 mr-1 text-xs"></i>
+              <div className={`rounded-full px-2 py-1 text-xs mr-2 flex items-center ${walletAddress ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-500'}`}>
+                <i className={`fas fa-wallet mr-1 text-xs ${walletAddress ? 'text-purple-500' : 'text-gray-500'}`}></i>
                 {walletAddress ? 'Connected' : 'Not Connected'}
               </div>
-              {walletAddress && <p className="text-black text-xs">{walletAddress}</p>}
+              {walletAddress && (
+                <p className="text-black text-xs font-mono">
+                  {formatWalletAddress(walletAddress)}
+                </p>
+              )}
             </div>
+            {walletAddress && balance && (
+              <div className="mt-2 text-sm text-gray-600">
+                <span className="bg-green-50 text-green-700 rounded-full px-2 py-0.5 text-xs">
+                  <i className="fas fa-coins mr-1 text-xs"></i>
+                  {balance} SOL
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

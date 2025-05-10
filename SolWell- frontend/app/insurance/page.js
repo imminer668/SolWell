@@ -2,6 +2,8 @@
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import BottomNavigation from '../components/BottomNavigation';
+import { useWallet } from '../contexts/WalletContext';
+import WalletDropdown from '../components/WalletDropdown';
 
 // CountUp component for number animation
 function CountUp({ end, duration }) {
@@ -110,6 +112,7 @@ const MOCK_API_DATA = {
 
 export default function Insurance() {
   const router = useRouter();
+  const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(true);
   const [animated, setAnimated] = useState(false);
   const [data, setData] = useState(null);
@@ -176,12 +179,16 @@ export default function Insurance() {
       {/* Top Navigation */}
       <div className="p-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-black">Insurance</h1>
-        <button 
-          className="rounded-full bg-purple-100 p-2 hover:bg-purple-200 transition-colors duration-300"
-          onClick={() => router.push('/connect-wallet')}
-        >
-          <i className="fas fa-wallet text-black"></i>
-        </button>
+        {walletAddress ? (
+          <WalletDropdown />
+        ) : (
+          <button 
+            className="rounded-full bg-purple-100 p-2 hover:bg-purple-200 transition-colors duration-300"
+            onClick={() => router.push('/')}
+          >
+            <i className="fas fa-wallet text-black"></i>
+          </button>
+        )}
       </div>
       
       {/* Error State */}

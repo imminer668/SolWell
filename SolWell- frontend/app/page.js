@@ -5,6 +5,7 @@ import Link from 'next/link';
 import BottomNavigation from './components/BottomNavigation';
 import { useWallet } from './contexts/WalletContext';
 import ConnectWalletModal from './components/ConnectWalletModal';
+import WalletDropdown from './components/WalletDropdown';
 
 const MOCK_DATA = {
   '7d': {
@@ -83,12 +84,16 @@ export default function Home() {
       {/* Top Navigation */}
       <div className="p-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-black">SolWell</h1>
-        <button 
-          className="rounded-full bg-purple-100 p-2"
-          onClick={() => router.push('/connect-wallet')}
-        >
-          <i className="fas fa-wallet text-black"></i>
-        </button>
+        {walletAddress ? (
+          <WalletDropdown />
+        ) : (
+          <button 
+            className="rounded-full bg-purple-100 p-2 hover:bg-purple-200 transition-colors duration-300"
+            onClick={() => setShowConnect(true)}
+          >
+            <i className="fas fa-wallet text-black"></i>
+          </button>
+        )}
       </div>
       
       {/* Health Data Overview */}
@@ -248,9 +253,15 @@ export default function Home() {
         </button>
       </div>
       
+      {/* Bottom Navigation */}
+      <BottomNavigation activePage="home" />
+      
       {/* Connect Wallet Modal */}
       {showConnect && (
-        <ConnectWalletModal onClose={handleCloseConnect} onSuccess={handleConnectSuccess} />
+        <ConnectWalletModal 
+          onClose={handleCloseConnect} 
+          onSuccess={handleConnectSuccess} 
+        />
       )}
       
       <style jsx>{`
@@ -404,9 +415,6 @@ export default function Home() {
           }
         }
       `}</style>
-      
-      {/* Bottom Navigation */}
-      <BottomNavigation activePage="home" />
     </div>
   );
 } 
