@@ -61,6 +61,11 @@ export default function Home() {
     }, 800);
   }, [period]);
 
+  // Custom pulse animation style
+  const pulseStyle = {
+    animation: 'pulse-gradient 1.5s ease-in-out infinite',
+  };
+
   // Key data click
   const handleDataClick = () => {
     if (!walletAddress) {
@@ -96,7 +101,9 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-3 mt-3">
             <div className="bg-white/20 rounded-lg p-3 cursor-pointer" onClick={handleDataClick}>
               {loading ? (
-                <div className="animate-pulse h-10 bg-white/30 rounded"></div>
+                <div className="animate-pulse h-10 bg-white/30 rounded flex items-center justify-center overflow-hidden">
+                  <div className="w-full h-1 bg-white/50 shimmer-loading"></div>
+                </div>
               ) : (
                 <>
                   <div className="flex items-center">
@@ -109,7 +116,9 @@ export default function Home() {
             </div>
             <div className="bg-white/20 rounded-lg p-3 cursor-pointer" onClick={handleDataClick}>
               {loading ? (
-                <div className="animate-pulse h-10 bg-white/30 rounded"></div>
+                <div className="animate-pulse h-10 bg-white/30 rounded flex items-center justify-center overflow-hidden">
+                  <div className="w-full h-1 bg-white/50 shimmer-loading"></div>
+                </div>
               ) : (
                 <>
                   <div className="flex items-center">
@@ -142,76 +151,90 @@ export default function Home() {
       {/* Detailed Health Data */}
       <div className="px-6 mt-6">
         <h3 className="font-bold text-black mb-3">Health Details</h3>
-        <div className="bg-gray-50 rounded-xl p-4 mb-4 cursor-pointer" onClick={handleDataClick}>
+        <div className="bg-white rounded-xl p-4 mb-4 shadow-sm border border-gray-100 hover:shadow-md transition duration-300 cursor-pointer" onClick={handleDataClick}>
           <div className="flex justify-between items-center">
             <div>
               <div className="flex items-center">
-                <i className="fas fa-heart text-purple-500 mr-2"></i>
+                <i className="fas fa-heart text-purple-500 mr-2 text-lg"></i>
                 <span className="text-black font-medium">Heart Rate</span>
               </div>
               {loading ? (
-                <div className="animate-pulse h-6 w-16 bg-gray-200 rounded mt-2"></div>
+                <div className="animate-pulse h-6 w-16 bg-gray-200 rounded mt-2 shimmer-loading"></div>
               ) : (
-                <p className="text-black font-bold text-xl">{data.heartRate} <span className="text-xs font-normal">bpm</span></p>
+                <p className="text-black font-bold text-2xl">{data.heartRate} <span className="text-xs font-normal">bpm</span></p>
               )}
             </div>
-            <div className="w-24 h-12 bg-gray-100 rounded flex items-end">
-              <div className="w-3 h-4 bg-purple-300 rounded-t mx-0.5"></div>
-              <div className="w-3 h-6 bg-purple-400 rounded-t mx-0.5"></div>
-              <div className="w-3 h-8 bg-purple-500 rounded-t mx-0.5"></div>
-              <div className="w-3 h-5 bg-purple-400 rounded-t mx-0.5"></div>
-              <div className="w-3 h-7 bg-purple-500 rounded-t mx-0.5"></div>
-              <div className="w-3 h-6 bg-purple-400 rounded-t mx-0.5"></div>
+            <div className="w-28 h-16 bg-gray-50 rounded-lg flex items-end overflow-hidden relative p-1 border border-gray-100">
+              {loading ? (
+                <div className="absolute inset-0 shimmer-loading"></div>
+              ) : (
+                <>
+                  <div className="w-4 h-0 bg-purple-300 rounded-t mx-0.5 transform transition-all duration-700 hover:h-12 animate-bar-grow" style={{"--final-height": "14px", "--delay": "0.1s"}}></div>
+                  <div className="w-4 h-0 bg-purple-400 rounded-t mx-0.5 transform transition-all duration-700 hover:h-14 animate-bar-grow" style={{"--final-height": "20px", "--delay": "0.2s"}}></div>
+                  <div className="w-4 h-0 bg-purple-500 rounded-t mx-0.5 transform transition-all duration-700 hover:h-16 animate-bar-grow" style={{"--final-height": "24px", "--delay": "0.3s"}}></div>
+                  <div className="w-4 h-0 bg-purple-400 rounded-t mx-0.5 transform transition-all duration-700 hover:h-13 animate-bar-grow" style={{"--final-height": "18px", "--delay": "0.4s"}}></div>
+                  <div className="w-4 h-0 bg-purple-500 rounded-t mx-0.5 transform transition-all duration-700 hover:h-15 animate-bar-grow" style={{"--final-height": "22px", "--delay": "0.5s"}}></div>
+                  <div className="w-4 h-0 bg-purple-400 rounded-t mx-0.5 transform transition-all duration-700 hover:h-12 animate-bar-grow" style={{"--final-height": "16px", "--delay": "0.6s"}}></div>
+                </>
+              )}
             </div>
           </div>
         </div>
         
-        <div className="bg-gray-50 rounded-xl p-4 mb-4 cursor-pointer" onClick={handleDataClick}>
+        <div className="bg-white rounded-xl p-4 mb-4 shadow-sm border border-gray-100 hover:shadow-md transition duration-300 cursor-pointer" onClick={handleDataClick}>
           <div className="flex justify-between items-center">
             <div>
               <div className="flex items-center">
-                <i className="fas fa-fire text-purple-500 mr-2"></i>
+                <i className="fas fa-fire text-purple-500 mr-2 text-lg"></i>
                 <span className="text-black font-medium">Calories</span>
               </div>
               {loading ? (
-                <div className="animate-pulse h-6 w-16 bg-gray-200 rounded mt-2"></div>
+                <div className="animate-pulse h-6 w-16 bg-gray-200 rounded mt-2 shimmer-loading"></div>
               ) : (
-                <p className="text-black font-bold text-xl">{data.calories} <span className="text-xs font-normal">kcal</span></p>
+                <p className="text-black font-bold text-2xl">{data.calories} <span className="text-xs font-normal">kcal</span></p>
               )}
             </div>
-            <div className="w-24 h-12 bg-gray-100 rounded flex justify-center items-center">
-              <div className="w-20 h-8 relative">
-                <svg viewBox="0 0 80 32" className="w-full h-full">
-                  <path d="M0,32 C10,28 20,16 30,22 C40,28 50,10 60,14 C70,18 80,24 80,32" fill="none" stroke="#9333ea" strokeWidth="2"></path>
-                </svg>
-                <div className="absolute right-0 bottom-0 w-2 h-2 bg-purple-500 rounded-full"></div>
-              </div>
+            <div className="w-28 h-16 bg-gray-50 rounded-lg flex justify-center items-center overflow-hidden relative p-1 border border-gray-100">
+              {loading ? (
+                <div className="absolute inset-0 shimmer-loading"></div>
+              ) : (
+                <div className="w-20 h-8 relative">
+                  <svg viewBox="0 0 80 32" className="w-full h-full">
+                    <path d="M0,32 C10,28 20,16 30,22 C40,28 50,10 60,14 C70,18 80,24 80,32" fill="none" stroke="#9333ea" strokeWidth="3" strokeLinecap="round" className="animate-draw-path"></path>
+                  </svg>
+                  <div className="absolute right-0 bottom-0 w-3 h-3 bg-purple-500 rounded-full animate-pulse-dot"></div>
+                </div>
+              )}
             </div>
           </div>
         </div>
         
-        <div className="bg-gray-50 rounded-xl p-4 cursor-pointer" onClick={handleDataClick}>
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition duration-300 cursor-pointer" onClick={handleDataClick}>
           <div className="flex justify-between items-center">
             <div>
               <div className="flex items-center">
-                <i className="fas fa-running text-purple-500 mr-2"></i>
+                <i className="fas fa-running text-purple-500 mr-2 text-lg"></i>
                 <span className="text-black font-medium">Activity Time</span>
               </div>
               {loading ? (
-                <div className="animate-pulse h-6 w-16 bg-gray-200 rounded mt-2"></div>
+                <div className="animate-pulse h-6 w-16 bg-gray-200 rounded mt-2 shimmer-loading"></div>
               ) : (
-                <p className="text-black font-bold text-xl">{data.activity} <span className="text-xs font-normal">minutes</span></p>
+                <p className="text-black font-bold text-2xl">{data.activity} <span className="text-xs font-normal">minutes</span></p>
               )}
             </div>
-            <div className="w-24 h-12 bg-gray-100 rounded flex items-center justify-center">
-              <div className="w-16 h-8 rounded-full bg-gray-200 relative">
-                <div className="absolute inset-0 rounded-full overflow-hidden">
-                  <div className="bg-gradient-to-r from-purple-400 to-green-300 h-full" style={{width: '75%'}}></div>
+            <div className="w-28 h-16 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden relative p-1 border border-gray-100">
+              {loading ? (
+                <div className="absolute inset-0 shimmer-loading"></div>
+              ) : (
+                <div className="w-20 h-10 rounded-full bg-gray-200 relative">
+                  <div className="absolute inset-0 rounded-full overflow-hidden">
+                    <div className="bg-gradient-to-r from-purple-400 to-green-300 h-full animate-progress-fill" style={{width: '75%'}}></div>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-sm text-black font-medium">75%</span>
+                  </div>
                 </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs text-black font-medium">75%</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -229,6 +252,158 @@ export default function Home() {
       {showConnect && (
         <ConnectWalletModal onClose={handleCloseConnect} onSuccess={handleConnectSuccess} />
       )}
+      
+      <style jsx>{`
+        .shimmer-loading {
+          background: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0.1) 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(255, 255, 255, 0.1) 100%
+          );
+          background-size: 200% 100%;
+          animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
+        }
+        
+        @keyframes pulse-gradient {
+          0%, 100% {
+            background-color: rgba(147, 51, 234, 0.3);
+          }
+          50% {
+            background-color: rgba(147, 51, 234, 0.5);
+          }
+        }
+        
+        .animate-bar-1 {
+          animation: barHeight 2s ease-in-out infinite;
+          animation-delay: 0.1s;
+        }
+        
+        .animate-bar-2 {
+          animation: barHeight 2s ease-in-out infinite;
+          animation-delay: 0.3s;
+        }
+        
+        .animate-bar-3 {
+          animation: barHeight 2s ease-in-out infinite;
+          animation-delay: 0.5s;
+        }
+        
+        .animate-bar-4 {
+          animation: barHeight 2s ease-in-out infinite;
+          animation-delay: 0.7s;
+        }
+        
+        .animate-bar-5 {
+          animation: barHeight 2s ease-in-out infinite;
+          animation-delay: 0.9s;
+        }
+        
+        .animate-bar-6 {
+          animation: barHeight 2s ease-in-out infinite;
+          animation-delay: 1.1s;
+        }
+        
+        .animate-bar-grow {
+          animation: barGrow 1s forwards, barPulse 2s 1s infinite;
+          animation-delay: var(--delay, 0s);
+        }
+        
+        @keyframes barGrow {
+          0% {
+            height: 0;
+          }
+          100% {
+            height: var(--final-height);
+          }
+        }
+        
+        @keyframes barPulse {
+          0%, 100% {
+            height: var(--final-height);
+          }
+          50% {
+            height: calc(var(--final-height) + 2px);
+          }
+        }
+        
+        @keyframes barHeight {
+          0%, 100% {
+            height: var(--h);
+          }
+          50% {
+            height: calc(var(--h) + 3px);
+          }
+        }
+        
+        .animate-draw-path {
+          stroke-dasharray: 100;
+          stroke-dashoffset: 100;
+          animation: drawPath 2s ease-in-out forwards, pulseStroke 2s 2s ease-in-out infinite;
+        }
+        
+        @keyframes drawPath {
+          to {
+            stroke-dashoffset: 0;
+          }
+        }
+        
+        @keyframes pulseStroke {
+          0%, 100% {
+            stroke-width: 3;
+          }
+          50% {
+            stroke-width: 4;
+          }
+        }
+        
+        .animate-pulse-dot {
+          animation: pulseDot 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulseDot {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.5);
+            opacity: 0.7;
+          }
+        }
+        
+        .animate-progress-fill {
+          animation: progressFill 1s ease-out forwards, progressPulse 2s 1s ease-in-out infinite;
+          width: 0%;
+        }
+        
+        @keyframes progressFill {
+          0% {
+            width: 0%;
+          }
+          100% {
+            width: 75%;
+          }
+        }
+        
+        @keyframes progressPulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.8;
+          }
+        }
+      `}</style>
       
       {/* Bottom Navigation */}
       <BottomNavigation activePage="home" />
