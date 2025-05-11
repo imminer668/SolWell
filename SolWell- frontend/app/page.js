@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import BottomNavigation from './components/BottomNavigation';
 import { useWallet } from './contexts/WalletContext';
+import { fetchHealthData } from './contexts/WalletContext';
 import ConnectWalletModal from './components/ConnectWalletModal';
 import WalletDropdown from './components/WalletDropdown';
+import { PublicKey } from '@solana/web3.js';
 
 const MOCK_DATA = {
   '7d': {
@@ -39,28 +41,74 @@ const MOCK_DATA = {
 };
 
 const PERIODS = [
-  { key: '7d', label: '7 Days' },
-  { key: '30d', label: '30 Days' },
-  { key: '365d', label: '365 Days' },
-  { key: 'all', label: 'All' },
+  { key: 'Week', label: '7 Days' },
+  { key: 'Month', label: '30 Days' },
+  { key: 'Year', label: '365 Days' },
+  { key: 'All', label: 'All' },
 ];
 
 export default function Home() {
   const router = useRouter();
   const { walletAddress } = useWallet();
-  const [period, setPeriod] = useState('7d');
+  const [period, setPeriod] = useState('Week');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showConnect, setShowConnect] = useState(false);
 
-  // Mock request data
+  // refresh data
   useEffect(() => {
     setLoading(true);
-    setTimeout(() => {
-      setData(MOCK_DATA[period]);
+    async function getData() {
+      if (walletAddress) {
+        console.log("Fetching data for wallet:", walletAddress);
+        console.log("Current period:", period);
+        try {
+          // create PublicKey object
+          const pubKey = new PublicKey(walletAddress);
+          
+          // get health data
+          const health = await fetchHealthData(pubKey, period);
+          console.log("Health data received:", health);
+          
+          // ensure all fields have values
+          setData({
+            steps: health.steps || 0,
+            sleep: health.sleep || 0,
+            heartRate: health.heartRate || 0,
+            calories: health.calories || 0,
+            activity: health.activeMinutes || 0,
+          });
+        } catch (e) {
+          console.error("Error in getData:", e);
+          // set default data when error
+          setData({
+            steps: 5000,
+            sleep: 7.0,
+            heartRate: 70,
+            calories: 300,
+            activity: 30,
+          });
+        }
+      } else {
+        // show default data when not connected
+        setData({
+          steps: 5000,
+          sleep: 7.0,
+          heartRate: 70,
+          calories: 300,
+          activity: 30,
+        });
+      }
       setLoading(false);
-    }, 800);
-  }, [period]);
+    }
+    getData();
+  }, [walletAddress, period]);
+
+  // handle period change
+  const handlePeriodChange = (newPeriod) => {
+    console.log("Changing period to:", newPeriod);
+    setPeriod(newPeriod);
+  };
 
   // Custom pulse animation style
   const pulseStyle = {
@@ -115,7 +163,7 @@ export default function Home() {
                     <i className="fas fa-shoe-prints mr-2"></i>
                     <span>Steps</span>
                   </div>
-                  <p className="text-xl font-bold mt-1">{data.steps.toLocaleString()}</p>
+                  <p className="text-xl font-bold mt-1">{data?.steps ? data.steps.toLocaleString() : 0}</p>
                 </>
               )}
             </div>
@@ -130,7 +178,7 @@ export default function Home() {
                     <i className="fas fa-moon mr-2"></i>
                     <span>Sleep</span>
                   </div>
-                  <p className="text-xl font-bold mt-1">{data.sleep} hours</p>
+                  <p className="text-xl font-bold mt-1">{data?.sleep ?? 0} hours</p>
                 </>
               )}
             </div>
@@ -145,7 +193,7 @@ export default function Home() {
             <button
               key={p.key}
               className={`px-3 py-1 rounded-full ${period === p.key ? 'bg-purple-500 text-white' : 'bg-gray-200 text-black'}`}
-              onClick={() => setPeriod(p.key)}
+              onClick={() => handlePeriodChange(p.key)}
             >
               {p.label}
             </button>
@@ -166,7 +214,7 @@ export default function Home() {
               {loading ? (
                 <div className="animate-pulse h-6 w-16 bg-gray-200 rounded mt-2 shimmer-loading"></div>
               ) : (
-                <p className="text-black font-bold text-2xl">{data.heartRate} <span className="text-xs font-normal">bpm</span></p>
+                <p className="text-black font-bold text-2xl">{data?.heartRate ?? 0} <span className="text-xs font-normal">bpm</span></p>
               )}
             </div>
             <div className="w-28 h-16 bg-gray-50 rounded-lg flex items-end overflow-hidden relative p-1 border border-gray-100">
@@ -196,7 +244,7 @@ export default function Home() {
               {loading ? (
                 <div className="animate-pulse h-6 w-16 bg-gray-200 rounded mt-2 shimmer-loading"></div>
               ) : (
-                <p className="text-black font-bold text-2xl">{data.calories} <span className="text-xs font-normal">kcal</span></p>
+                <p className="text-black font-bold text-2xl">{data?.calories ?? 0} <span className="text-xs font-normal">kcal</span></p>
               )}
             </div>
             <div className="w-28 h-16 bg-gray-50 rounded-lg flex justify-center items-center overflow-hidden relative p-1 border border-gray-100">
@@ -224,7 +272,7 @@ export default function Home() {
               {loading ? (
                 <div className="animate-pulse h-6 w-16 bg-gray-200 rounded mt-2 shimmer-loading"></div>
               ) : (
-                <p className="text-black font-bold text-2xl">{data.activity} <span className="text-xs font-normal">minutes</span></p>
+                <p className="text-black font-bold text-2xl">{data?.activity ?? 0} <span className="text-xs font-normal">minutes</span></p>
               )}
             </div>
             <div className="w-28 h-16 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden relative p-1 border border-gray-100">

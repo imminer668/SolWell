@@ -1,0 +1,184 @@
+{
+  "address": "5D8DSGCWhzyFtEFKAZxYFVUmn9dgMS4PRABNwEJyjmH6",
+  "metadata": {
+    "name": "health_data",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "set_health_data",
+      "discriminator": [
+        222,
+        248,
+        21,
+        128,
+        5,
+        149,
+        74,
+        192
+      ],
+      "accounts": [
+        {
+          "name": "health_data",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  101,
+                  97,
+                  108,
+                  116,
+                  104,
+                  95,
+                  105,
+                  110,
+                  102,
+                  111
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "time_range"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "time_range",
+          "type": {
+            "defined": {
+              "name": "TimeRange"
+            }
+          }
+        },
+        {
+          "name": "steps",
+          "type": "u32"
+        },
+        {
+          "name": "sleep",
+          "type": "f32"
+        },
+        {
+          "name": "heart_rate",
+          "type": "u16"
+        },
+        {
+          "name": "calories",
+          "type": "u16"
+        },
+        {
+          "name": "active_minutes",
+          "type": "u16"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "HealthData",
+      "discriminator": [
+        135,
+        173,
+        61,
+        234,
+        197,
+        214,
+        156,
+        146
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized access"
+    }
+  ],
+  "types": [
+    {
+      "name": "HealthData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "time_range",
+            "type": {
+              "defined": {
+                "name": "TimeRange"
+              }
+            }
+          },
+          {
+            "name": "steps",
+            "type": "u32"
+          },
+          {
+            "name": "sleep",
+            "type": "f32"
+          },
+          {
+            "name": "heart_rate",
+            "type": "u16"
+          },
+          {
+            "name": "calories",
+            "type": "u16"
+          },
+          {
+            "name": "active_minutes",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TimeRange",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Day"
+          },
+          {
+            "name": "Week"
+          },
+          {
+            "name": "Month"
+          },
+          {
+            "name": "Year"
+          },
+          {
+            "name": "All"
+          }
+        ]
+      }
+    }
+  ]
+}
