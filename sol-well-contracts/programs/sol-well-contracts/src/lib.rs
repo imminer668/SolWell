@@ -1,84 +1,106 @@
-use std::fmt::Display;
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::pubkey::Pubkey;
+use std::string::ToString;
 
-declare_id!("FKmiJUF4PdDWNPrtPmZGLYXsqTMzXmjcsC9bnuuEFW2M");
+declare_id!("5D8DSGCWhzyFtEFKAZxYFVUmn9dgMS4PRABNwEJyjmH6");
 
 #[program]
-pub mod data_storage {
+pub mod health_data {
     use super::*;
 
-    // 更新数据
-    pub fn update(ctx: Context<Update>, heart_rate:u8,calorie: u16,movement_time: u8,time_range:TimeRange) -> Result<()> {
-        let health_info = &mut ctx.accounts.health_info;
-        health_info.user = ctx.accounts.user.key();
-        health_info.time_range = time_range;
-        health_info.heart_rate = heart_rate;
-        health_info.calorie = calorie;
-        health_info.movement_time = movement_time;
+    // set data
+    pub fn set_health_data(
+        ctx: Context<SetHealthData>,
+        time_range: TimeRange,
+        steps: u32,
+        sleep: f32,
+        heart_rate: u16,
+        calories: u16,
+        active_minutes: u16,
+    ) -> Result<()> {
+        let health_data = &mut ctx.accounts.health_data;
+
+        // set user
+        health_data.user = ctx.accounts.user.key();
+        // update health_data
+        health_data.time_range = time_range;
+        health_data.steps = steps;
+        health_data.sleep = sleep;
+        health_data.heart_rate = heart_rate;
+        health_data.calories = calories;
+        health_data.active_minutes = active_minutes;
+
         Ok(())
     }
-
 }
 
-
-// 时间范围枚举
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
+// health data in time range
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq, Default)]
 pub enum TimeRange {
+    #[default]
     Week,
     Month,
     Year,
     All,
 }
 
-impl Display for TimeRange {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = match self {
-            TimeRange::Week => "7天".to_string(),
-            TimeRange::Month => "30天".to_string(),
-            TimeRange::Year => "365天".to_string(),
-            TimeRange::All => "全部".to_string(),
-        };
-        write!(f, "{}", str)
-    }
+// define the data strcture of HealthData's PDA
+#[account]
+#[derive(Default)]
+pub struct HealthData {
+    pub user: Pubkey,
+    pub time_range: TimeRange,
+    pub steps: u32,
+    pub sleep: f32,
+    pub heart_rate: u16,
+    pub calories: u16,
+    pub active_minutes: u16,
 }
 
-// 更新账户结构
+// Define which account that you want to modify when you call to the set_health_data directive.
 #[derive(Accounts)]
 #[instruction(time_range: TimeRange)]
-pub struct Update<'info> {
+pub struct SetHealthData<'info> {
     #[account(
-        init,
+        init_if_needed,
         payer = user,
-        space = 8 + HealthInfo::LEN,
-        seeds = [b"health_info", user.key().as_ref(),time_range.to_string().as_bytes()],
+        space = 8 + HealthData::LEN,
+        seeds = [
+            b"health_info",
+            user.key().as_ref(),
+            time_range.to_string().as_bytes()
+        ],
         bump
     )]
-    pub health_info: Account<'info, HealthInfo>,
+    pub health_data: Account<'info, HealthData>,
+
     #[account(mut)]
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
-
-
-// 数据账户结构
-#[account]
-pub struct HealthInfo{
-    pub user:Pubkey,
-    pub time_range:TimeRange,
-    pub heart_rate: u8,  // 心跳
-    pub calorie: u16,  // 卡路里
-    pub movement_time: u8,  // 活动时间
+impl HealthData {
+    const LEN: usize = 32   // user
+        + 1                 // time_range (enum index)
+        + 4                 // steps (u32)
+        + 4                 // sleep (f32)
+        + 2                 // heart_rate (u16)
+        + 2                 // calories (u16)
+        + 2;                // active_minutes (u16)
 }
 
+impl ToString for TimeRange {
+    fn to_string(&self) -> String {
+        match self {
+            TimeRange::Week => "7 days".to_string(),
+            TimeRange::Month => "30 days".to_string(),
+            TimeRange::Year => "365 days".to_string(),
+            TimeRange::All => "All".to_string(),
+        }
+    }
+}
 
 #[error_code]
 pub enum ErrorCode {
     #[msg("Unauthorized access")]
     Unauthorized,
 }
-
-
-
-
