@@ -37,6 +37,7 @@ pub mod health_data {
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq, Default)]
 pub enum TimeRange {
     #[default]
+    Day,
     Week,
     Month,
     Year,
@@ -91,6 +92,7 @@ impl HealthData {
 impl ToString for TimeRange {
     fn to_string(&self) -> String {
         match self {
+            TimeRange::Day => "today".to_string(),
             TimeRange::Week => "7 days".to_string(),
             TimeRange::Month => "30 days".to_string(),
             TimeRange::Year => "365 days".to_string(),
