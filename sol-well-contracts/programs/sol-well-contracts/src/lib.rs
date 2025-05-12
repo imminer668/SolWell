@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use std::string::ToString;
 
-declare_id!("5D8DSGCWhzyFtEFKAZxYFVUmn9dgMS4PRABNwEJyjmH6");
+declare_id!("ESrVTzUZSTro7K5j3eibWLX4mzxPHN2JHnNW4gCSidUr");
 
 #[program]
 pub mod health_data {
@@ -92,10 +92,10 @@ impl HealthData {
 impl ToString for TimeRange {
     fn to_string(&self) -> String {
         match self {
-            TimeRange::Day => "today".to_string(),
-            TimeRange::Week => "7 days".to_string(),
-            TimeRange::Month => "30 days".to_string(),
-            TimeRange::Year => "365 days".to_string(),
+            TimeRange::Day => "Day".to_string(),
+            TimeRange::Week => "Week".to_string(),
+            TimeRange::Month => "Month".to_string(),
+            TimeRange::Year => "Year".to_string(),
             TimeRange::All => "All".to_string(),
         }
     }
