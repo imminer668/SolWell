@@ -13,6 +13,9 @@ const isClient = typeof window !== 'undefined';
 // Solana devnet network
 const SOLANA_NETWORK = clusterApiUrl('devnet');
 
+// check if it is mobile device
+const isMobile = isClient && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 export function WalletProvider({ children }) {
   const [walletAddress, setWalletAddress] = useState(null);
   const [connecting, setConnecting] = useState(false);
@@ -22,13 +25,26 @@ export function WalletProvider({ children }) {
   // Check if phantom wallet is installed
   const getProvider = () => {
     if (isClient) {
+      // check if it is mobile device
+      if (isMobile) {
+        // on mobile device, check if there is solana object
+        if (window?.solana?.isPhantom) {
+          return window.solana;
+        }
+        // if no, maybe need to open Phantom App
+        window.location.href = 'https://phantom.app/ul/browse/' + encodeURIComponent(window.location.href);
+        return null;
+      }
+      
+      // window environment
       if ('phantom' in window) {
         const provider = window.phantom?.solana;
         if (provider?.isPhantom) {
           return provider;
         }
       }
-      // Open link to phantom wallet
+      
+      // if Phantom wallet is not installed, open installation page
       window.open('https://phantom.app/', '_blank');
     }
     return null;
@@ -137,15 +153,38 @@ export function WalletProvider({ children }) {
     try {
       const provider = getProvider();
       if (provider) {
-        const resp = await provider.connect();
-        if (resp && resp.publicKey) {
-          const pubkeyStr = resp.publicKey.toString();
-          setWalletAddress(pubkeyStr);
-          fetchBalance(resp.publicKey);
-          return pubkeyStr; // Return connected address
+        try {
+          const resp = await provider.connect();
+          if (resp && resp.publicKey) {
+            const pubkeyStr = resp.publicKey.toString();
+            setWalletAddress(pubkeyStr);
+            fetchBalance(resp.publicKey);
+            return pubkeyStr; // Return connected address
+          }
+        } catch (error) {
+          console.error("Connection error:", error);
+          // if the error is because the wallet is not installed or not available
+          if (error.message?.includes("not found") || error.message?.includes("not installed")) {
+            if (isMobile) {
+              // on mobile device, try to open Phantom App
+              window.location.href = 'https://phantom.app/ul/browse/' + encodeURIComponent(window.location.href);
+            } else {
+              // on desktop environment, prompt to install
+              window.open('https://phantom.app/', '_blank');
+            }
+          }
+          throw error;
         }
       }
-      throw new Error("Failed to connect wallet - no public key returned");
+      
+      // if no provider is found but no error is thrown, it may be because of non-local environment
+      if (isMobile) {
+        // on mobile device, try to open Phantom through deep link
+        window.location.href = 'https://phantom.app/ul/browse/' + encodeURIComponent(window.location.href);
+        return "redirecting"; // special return value means redirecting
+      }
+      
+      throw new Error("Failed to connect wallet - no provider available");
     } catch (err) {
       console.error("Error connecting wallet:", err);
       throw err;
@@ -365,10 +404,23 @@ export async function syncHealthData(walletPublicKey, timeRangeKey = 'Week', hea
     const programId = new PublicKey(healthIdl.address);
     
     const getProvider = () => {
-      if (typeof window !== 'undefined' && 'phantom' in window) {
-        const provider = window.phantom?.solana;
-        if (provider?.isPhantom) {
-          return provider;
+      if (typeof window !== 'undefined') {
+        // check if it is mobile device
+        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobileDevice) {
+          // on mobile device, check if there is solana object
+          if (window?.solana?.isPhantom) {
+            return window.solana;
+          }
+        } else {
+          // desktop environment
+          if ('phantom' in window) {
+            const provider = window.phantom?.solana;
+            if (provider?.isPhantom) {
+              return provider;
+            }
+          }
         }
       }
       throw new Error("Phantom wallet not found");
@@ -512,11 +564,11 @@ export async function syncHealthData(walletPublicKey, timeRangeKey = 'Week', hea
 // generate reasonable health data for different time ranges
 function generateHealthDataForRange(timeRange, baseData) {
   // use fixed reasonable baseline values, not relying on input baseData
-  const baseDailySteps = 8000; // average daily steps
+  const baseDailySteps = 8000 * (1.2 + Math.random() * (0.5 - 0)); // average daily steps
   const baseDailySleep = baseData?.sleep || 7.0; // average daily sleep time
   const baseDailyHeartRate = baseData?.heartRate || 70; // average heart rate
   const baseDailyCalories = 350; // average daily calories consumption
-  const baseDailyActiveMinutes = 30; // average daily active minutes
+  const baseDailyActiveMinutes = 60*randomizeValue(1.2, 0.3, 0); // average daily active minutes
   
   // generate reasonable health data for different time ranges
   switch(timeRange) {

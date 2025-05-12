@@ -6,6 +6,7 @@ import BottomNavigation from './components/BottomNavigation';
 import { useWallet } from './contexts/WalletContext';
 import { fetchHealthData, syncHealthData } from './contexts/WalletContext';
 import ConnectWalletModal from './components/ConnectWalletModal';
+import SyncConfirmModal from './components/SyncConfirmModal';
 import WalletDropdown from './components/WalletDropdown';
 import { PublicKey } from '@solana/web3.js';
 import ToastNotification from './components/ToastNotification';
@@ -55,6 +56,7 @@ export default function Home() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showConnect, setShowConnect] = useState(false);
+  const [showSyncConfirm, setShowSyncConfirm] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncPrompted, setSyncPrompted] = useState(false);
   const [toast, setToast] = useState(null);
@@ -124,30 +126,8 @@ export default function Home() {
       return;
     }
 
-    try {
-      setSyncing(true);
-      const pubKey = new PublicKey(walletAddress);
-      
-      // Call syncHealthData function
-      const result = await syncHealthData(pubKey, period, data);
-      
-      // Show success message
-      if (result.success) {
-        setToast({
-          message: result.message,
-          type: 'success'
-        });
-        console.log("Sync successful:", result.txId);
-      }
-    } catch (error) {
-      console.error("Error syncing health data:", error);
-      setToast({
-        message: "Failed to sync health data. Please try again.",
-        type: 'error'
-      });
-    } finally {
-      setSyncing(false);
-    }
+    // Show sync confirmation modal
+    setShowSyncConfirm(true);
   };
 
   // Custom pulse animation style
@@ -168,15 +148,41 @@ export default function Home() {
   // Close after successful connection
   const handleConnectSuccess = (shouldSync) => {
     setShowConnect(false);
-    // Reset sync prompted flag
-    setSyncPrompted(true);
     
-    // If user opted to sync data after connecting, trigger sync
     if (shouldSync) {
-      // Small delay to ensure wallet is fully connected
-      setTimeout(() => {
-        handleSyncData();
-      }, 1000);
+      // Show sync confirmation modal instead of immediately syncing
+      setShowSyncConfirm(true);
+    }
+  };
+
+  // Handle sync confirmation
+  const handleSyncConfirm = async () => {
+    try {
+      setSyncing(true);
+      const pubKey = new PublicKey(walletAddress);
+      
+      // Call syncHealthData function
+      const result = await syncHealthData(pubKey, period, data);
+      
+      // Show success message
+      if (result.success) {
+        setToast({
+          message: result.message,
+          type: 'success'
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+        console.log("Sync successful:", result.txId);
+      }
+    } catch (error) {
+      console.error("Error syncing health data:", error);
+      setToast({
+        message: "Failed to sync health data. Please try again.",
+        type: 'error'
+      });
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -202,7 +208,7 @@ export default function Home() {
         <div className="rounded-xl bg-gradient-to-r from-purple-500 to-green-400 p-4 text-white">
           <div className="flex justify-between items-center mb-2">
             <h2 className="font-bold">Today's Health Overview</h2>
-            <span className="text-xs">October 12, 2023</span>
+            <span className="text-xs">{new Date().toLocaleDateString()}</span>
           </div>
           <div className="grid grid-cols-2 gap-3 mt-3">
             <div className="bg-white/20 rounded-lg p-3 cursor-pointer" onClick={handleDataClick}>
@@ -270,17 +276,47 @@ export default function Home() {
                 <p className="text-black font-bold text-2xl">{data?.heartRate ?? 0} <span className="text-xs font-normal">bpm</span></p>
               )}
             </div>
-            <div className="w-28 h-16 bg-gray-50 rounded-lg flex items-end overflow-hidden relative p-1 border border-gray-100">
+            <div className="w-28 h-16 bg-gray-50 rounded-lg flex items-end justify-between overflow-hidden relative p-1 border border-gray-100">
               {loading ? (
                 <div className="absolute inset-0 shimmer-loading"></div>
               ) : (
                 <>
-                  <div className="w-4 h-0 bg-purple-300 rounded-t mx-0.5 transform transition-all duration-700 hover:h-12 animate-bar-grow" style={{"--final-height": "14px", "--delay": "0.1s"}}></div>
-                  <div className="w-4 h-0 bg-purple-400 rounded-t mx-0.5 transform transition-all duration-700 hover:h-14 animate-bar-grow" style={{"--final-height": "20px", "--delay": "0.2s"}}></div>
-                  <div className="w-4 h-0 bg-purple-500 rounded-t mx-0.5 transform transition-all duration-700 hover:h-16 animate-bar-grow" style={{"--final-height": "24px", "--delay": "0.3s"}}></div>
-                  <div className="w-4 h-0 bg-purple-400 rounded-t mx-0.5 transform transition-all duration-700 hover:h-13 animate-bar-grow" style={{"--final-height": "18px", "--delay": "0.4s"}}></div>
-                  <div className="w-4 h-0 bg-purple-500 rounded-t mx-0.5 transform transition-all duration-700 hover:h-15 animate-bar-grow" style={{"--final-height": "22px", "--delay": "0.5s"}}></div>
-                  <div className="w-4 h-0 bg-purple-400 rounded-t mx-0.5 transform transition-all duration-700 hover:h-12 animate-bar-grow" style={{"--final-height": "16px", "--delay": "0.6s"}}></div>
+                  {/* Heart rate bars with pulse animation */}
+                  {(() => {
+                    // Get heart rate value
+                    const heartRate = data?.heartRate || 70;
+                    
+                    // Base height and color based on heart rate
+                    const baseHeight = heartRate / 100 * 20;
+                    const baseColor = heartRate > 90 ? 'bg-red-500' : 
+                                     heartRate > 75 ? 'bg-purple-600' : 'bg-purple-500';
+                    const altColor = heartRate > 90 ? 'bg-red-400' : 
+                                    heartRate > 75 ? 'bg-purple-500' : 'bg-purple-400';
+                    
+                    // Heights with variation
+                    const heights = [
+                      Math.max(8, Math.min(24, baseHeight + 2)),
+                      Math.max(6, Math.min(20, baseHeight - 4)),
+                      Math.max(8, Math.min(24, baseHeight + 4)),
+                      Math.max(6, Math.min(20, baseHeight - 2)),
+                      Math.max(8, Math.min(24, baseHeight + 3)),
+                      Math.max(6, Math.min(20, baseHeight - 3))
+                    ];
+                    
+                    // Generate a unique key based on period and heart rate
+                    const key = `${period}-${heartRate}`;
+                    
+                    return (
+                      <div key={key} className="flex items-end justify-between w-full h-full">
+                        <div className={`w-3 ${baseColor} rounded-t animate-pulse-1`} style={{ height: `${heights[0]}px` }}></div>
+                        <div className={`w-3 ${altColor} rounded-t animate-pulse-2`} style={{ height: `${heights[1]}px` }}></div>
+                        <div className={`w-3 ${baseColor} rounded-t animate-pulse-3`} style={{ height: `${heights[2]}px` }}></div>
+                        <div className={`w-3 ${altColor} rounded-t animate-pulse-4`} style={{ height: `${heights[3]}px` }}></div>
+                        <div className={`w-3 ${baseColor} rounded-t animate-pulse-5`} style={{ height: `${heights[4]}px` }}></div>
+                        <div className={`w-3 ${altColor} rounded-t animate-pulse-6`} style={{ height: `${heights[5]}px` }}></div>
+                      </div>
+                    );
+                  })()}
                 </>
               )}
             </div>
@@ -305,8 +341,25 @@ export default function Home() {
                 <div className="absolute inset-0 shimmer-loading"></div>
               ) : (
                 <div className="w-20 h-8 relative">
+                  {/* generate curve chart based on calories value */}
                   <svg viewBox="0 0 80 32" className="w-full h-full">
-                    <path d="M0,32 C10,28 20,16 30,22 C40,28 50,10 60,14 C70,18 80,24 80,32" fill="none" stroke="#9333ea" strokeWidth="3" strokeLinecap="round" className="animate-draw-path"></path>
+                  {/* adjust curve shape based on calories value */}
+                    {(() => {
+                      const caloriesValue = data?.calories || 0;
+                      const intensity = Math.min(1, caloriesValue / 1000);
+                      const midPoint = 16 + (intensity * 12);
+                      const amplitude = 10 + (intensity * 10);
+                      
+                      // dynamically generate path
+                      const path = `M0,32 C20,${32-amplitude} 40,${midPoint} 60,${32-amplitude*0.8} C70,${32-amplitude*0.5} 75,${32-amplitude*0.3} 80,32`;
+                      
+                      // color changes with calories value
+                      const color = caloriesValue > 500 ? "#9333ea" : caloriesValue > 250 ? "#a855f7" : "#c084fc";
+                      
+                      return (
+                        <path d={path} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" className="animate-draw-path"></path>
+                      );
+                    })()}
                   </svg>
                   <div className="absolute right-0 bottom-0 w-3 h-3 bg-purple-500 rounded-full animate-pulse-dot"></div>
                 </div>
@@ -333,12 +386,42 @@ export default function Home() {
                 <div className="absolute inset-0 shimmer-loading"></div>
               ) : (
                 <div className="w-20 h-10 rounded-full bg-gray-200 relative">
-                  <div className="absolute inset-0 rounded-full overflow-hidden">
-                    <div className="bg-gradient-to-r from-purple-400 to-green-300 h-full animate-progress-fill" style={{width: '75%'}}></div>
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-sm text-black font-medium">75%</span>
-                  </div>
+                  {/* calculate percentage based on activity time */}
+                  {(() => {
+                    // set target value based on different time range
+                    let targetMinutes;
+                    switch(period) {
+                      case 'Week': targetMinutes = 420; break; // 420 minutes per week
+                      case 'Month': targetMinutes = 1800; break; // 1800 minutes per month
+                      case 'Year': targetMinutes = 21900; break; // 21900 minutes per year
+                      case 'All': targetMinutes = 43800; break; // 43800 minutes in total
+                      default: targetMinutes = 60; // 60 minutes per day
+                    }
+                    
+                    // calculate percentage, max 100%
+                    const activityValue = data?.activity || 0;
+                    const percentage = Math.min(100, Math.round((activityValue / targetMinutes) * 100));
+                    
+                    // select color based on percentage
+                    const getGradient = () => {
+                      if (percentage >= 80) return 'from-green-400 to-green-300';
+                      if (percentage >= 50) return 'from-purple-400 to-green-300';
+                      return 'from-purple-400 to-red-300';
+                    };
+                    
+                    return (
+                      <>
+                        <div className="absolute inset-0 rounded-full overflow-hidden">
+                          <div className={`bg-gradient-to-r ${getGradient()} h-full animate-progress-fill`} style={{
+                            "--percent": `${percentage}%`
+                          }}></div>
+                        </div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-sm text-black font-medium">{percentage}%</span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               )}
             </div>
@@ -351,7 +434,7 @@ export default function Home() {
         <button 
           className={`w-full py-3 ${syncing ? 'bg-gray-500' : 'bg-black'} text-white rounded-xl font-medium flex items-center justify-center`} 
           onClick={handleSyncData}
-          disabled={syncing || !walletAddress}
+          disabled={syncing}
         >
           {syncing ? (
             <>
@@ -375,6 +458,14 @@ export default function Home() {
         <ConnectWalletModal 
           onClose={handleCloseConnect} 
           onSuccess={handleConnectSuccess} 
+        />
+      )}
+      
+      {/* Sync Confirm Modal */}
+      {showSyncConfirm && (
+        <SyncConfirmModal
+          onClose={() => setShowSyncConfirm(false)}
+          onConfirm={handleSyncConfirm}
         />
       )}
       
@@ -420,36 +511,43 @@ export default function Home() {
         .animate-bar-1 {
           animation: barHeight 2s ease-in-out infinite;
           animation-delay: 0.1s;
+          --h: var(--height, 16px);
         }
         
         .animate-bar-2 {
           animation: barHeight 2s ease-in-out infinite;
           animation-delay: 0.3s;
+          --h: var(--height, 16px);
         }
         
         .animate-bar-3 {
           animation: barHeight 2s ease-in-out infinite;
           animation-delay: 0.5s;
+          --h: var(--height, 16px);
         }
         
         .animate-bar-4 {
           animation: barHeight 2s ease-in-out infinite;
           animation-delay: 0.7s;
+          --h: var(--height, 16px);
         }
         
         .animate-bar-5 {
           animation: barHeight 2s ease-in-out infinite;
           animation-delay: 0.9s;
+          --h: var(--height, 16px);
         }
         
         .animate-bar-6 {
           animation: barHeight 2s ease-in-out infinite;
           animation-delay: 1.1s;
+          --h: var(--height, 16px);
         }
         
         .animate-bar-grow {
-          animation: barGrow 1s forwards, barPulse 2s 1s infinite;
+          animation: barGrow 1.2s forwards, barPulse 1.5s 1.2s infinite;
           animation-delay: var(--delay, 0s);
+          height: 0 !important;
         }
         
         @keyframes barGrow {
@@ -461,21 +559,34 @@ export default function Home() {
           }
         }
         
-        @keyframes barPulse {
-          0%, 100% {
-            height: var(--final-height);
+        .animate-pulse-1, .animate-pulse-2, .animate-pulse-3, 
+        .animate-pulse-4, .animate-pulse-5, .animate-pulse-6 {
+          transform-origin: bottom;
+          animation: barGrowUp 0.5s ease-out forwards, barPulse 1.5s 0.5s ease-in-out infinite;
+        }
+        
+        .animate-pulse-1 { animation-delay: 0s, 0.5s; }
+        .animate-pulse-2 { animation-delay: 0.1s, 0.6s; }
+        .animate-pulse-3 { animation-delay: 0.2s, 0.7s; }
+        .animate-pulse-4 { animation-delay: 0.3s, 0.8s; }
+        .animate-pulse-5 { animation-delay: 0.4s, 0.9s; }
+        .animate-pulse-6 { animation-delay: 0.5s, 1.0s; }
+        
+        @keyframes barGrowUp {
+          0% {
+            transform: scaleY(0);
           }
-          50% {
-            height: calc(var(--final-height) + 2px);
+          100% {
+            transform: scaleY(1);
           }
         }
         
-        @keyframes barHeight {
+        @keyframes barPulse {
           0%, 100% {
-            height: var(--h);
+            transform: scaleY(1);
           }
           50% {
-            height: calc(var(--h) + 3px);
+            transform: scaleY(1.2);
           }
         }
         
@@ -517,7 +628,6 @@ export default function Home() {
         
         .animate-progress-fill {
           animation: progressFill 1s ease-out forwards, progressPulse 2s 1s ease-in-out infinite;
-          width: 0%;
         }
         
         @keyframes progressFill {
@@ -525,7 +635,7 @@ export default function Home() {
             width: 0%;
           }
           100% {
-            width: 75%;
+            width: var(--percent, 75%);
           }
         }
         
