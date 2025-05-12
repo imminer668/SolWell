@@ -5,12 +5,18 @@ import { useState } from 'react';
 export default function ConnectWalletModal({ onClose, onSuccess }) {
   const { connectWallet, connecting, walletAddress } = useWallet();
   const [connectingLocal, setConnectingLocal] = useState(false);
+  const [syncAfterConnect, setSyncAfterConnect] = useState(true);
 
   const handleConnect = async () => {
     setConnectingLocal(true);
-    await connectWallet();
-    setConnectingLocal(false);
-    if (onSuccess) onSuccess();
+    try {
+      await connectWallet();
+      if (onSuccess) onSuccess(syncAfterConnect);
+    } catch (error) {
+      console.error("Connection error:", error);
+    } finally {
+      setConnectingLocal(false);
+    }
   };
 
   return (
@@ -21,7 +27,22 @@ export default function ConnectWalletModal({ onClose, onSuccess }) {
           <i className="fas fa-wallet text-white text-3xl"></i>
         </div>
         <h2 className="text-2xl font-bold text-black text-center">Connect Your Wallet</h2>
-        <p className="text-black text-center mt-2 mb-8">Connect your Solana wallet to sync health data and access insurance services</p>
+        <p className="text-black text-center mt-2 mb-4">Connect your Solana wallet to sync health data and access insurance services</p>
+        
+        {/* Sync checkbox */}
+        <div className="flex items-center mb-4 px-2">
+          <input 
+            type="checkbox" 
+            id="syncData" 
+            checked={syncAfterConnect} 
+            onChange={(e) => setSyncAfterConnect(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="syncData" className="ml-2 text-sm font-medium text-gray-700">
+            Sync health data to Solana after connecting
+          </label>
+        </div>
+        
         <div className="w-full space-y-4">
           <button
             className="w-full py-4 bg-black text-white rounded-xl font-medium flex items-center justify-center disabled:opacity-60"
@@ -48,6 +69,10 @@ export default function ConnectWalletModal({ onClose, onSuccess }) {
           @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+          }
+          
+          .gradient-bg {
+            background: linear-gradient(135deg, #9333ea, #4ade80);
           }
         `}</style>
       </div>

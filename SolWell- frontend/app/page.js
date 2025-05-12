@@ -4,34 +4,35 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import BottomNavigation from './components/BottomNavigation';
 import { useWallet } from './contexts/WalletContext';
-import { fetchHealthData } from './contexts/WalletContext';
+import { fetchHealthData, syncHealthData } from './contexts/WalletContext';
 import ConnectWalletModal from './components/ConnectWalletModal';
 import WalletDropdown from './components/WalletDropdown';
 import { PublicKey } from '@solana/web3.js';
+import ToastNotification from './components/ToastNotification';
 
 const MOCK_DATA = {
-  '7d': {
+  'Week': {
     steps: 8456,
     sleep: 7.3,
     heartRate: 72,
     calories: 342,
     activity: 45,
   },
-  '30d': {
+  'Month': {
     steps: 12034,
     sleep: 6.8,
     heartRate: 75,
     calories: 410,
     activity: 38,
   },
-  '365d': {
+  'Year': {
     steps: 320000,
     sleep: 6.5,
     heartRate: 78,
     calories: 12000,
     activity: 30,
   },
-  all: {
+  'All': {
     steps: 500000,
     sleep: 6.9,
     heartRate: 74,
@@ -54,6 +55,9 @@ export default function Home() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showConnect, setShowConnect] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncPrompted, setSyncPrompted] = useState(false);
+  const [toast, setToast] = useState(null);
 
   // refresh data
   useEffect(() => {
@@ -78,6 +82,8 @@ export default function Home() {
             calories: health.calories || 0,
             activity: health.activeMinutes || 0,
           });
+
+          // No need for prompt here as it's handled in ConnectWalletModal
         } catch (e) {
           console.error("Error in getData:", e);
           // set default data when error
@@ -98,6 +104,7 @@ export default function Home() {
           calories: 300,
           activity: 30,
         });
+        setSyncPrompted(false);
       }
       setLoading(false);
     }
@@ -108,6 +115,39 @@ export default function Home() {
   const handlePeriodChange = (newPeriod) => {
     console.log("Changing period to:", newPeriod);
     setPeriod(newPeriod);
+  };
+
+  // Sync health data to Solana
+  const handleSyncData = async () => {
+    if (!walletAddress || !data) {
+      setShowConnect(true);
+      return;
+    }
+
+    try {
+      setSyncing(true);
+      const pubKey = new PublicKey(walletAddress);
+      
+      // Call syncHealthData function
+      const result = await syncHealthData(pubKey, period, data);
+      
+      // Show success message
+      if (result.success) {
+        setToast({
+          message: result.message,
+          type: 'success'
+        });
+        console.log("Sync successful:", result.txId);
+      }
+    } catch (error) {
+      console.error("Error syncing health data:", error);
+      setToast({
+        message: "Failed to sync health data. Please try again.",
+        type: 'error'
+      });
+    } finally {
+      setSyncing(false);
+    }
   };
 
   // Custom pulse animation style
@@ -124,8 +164,21 @@ export default function Home() {
 
   // Close connect-wallet
   const handleCloseConnect = () => setShowConnect(false);
+  
   // Close after successful connection
-  const handleConnectSuccess = () => setShowConnect(false);
+  const handleConnectSuccess = (shouldSync) => {
+    setShowConnect(false);
+    // Reset sync prompted flag
+    setSyncPrompted(true);
+    
+    // If user opted to sync data after connecting, trigger sync
+    if (shouldSync) {
+      // Small delay to ensure wallet is fully connected
+      setTimeout(() => {
+        handleSyncData();
+      }, 1000);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 pb-20">
@@ -295,9 +348,22 @@ export default function Home() {
       
       {/* Sync Button */}
       <div className="px-6 mt-6">
-        <button className="w-full py-3 bg-black text-white rounded-xl font-medium flex items-center justify-center" onClick={handleDataClick}>
-          <i className="fas fa-sync-alt mr-2"></i>
-          Sync Health Data to Solana
+        <button 
+          className={`w-full py-3 ${syncing ? 'bg-gray-500' : 'bg-black'} text-white rounded-xl font-medium flex items-center justify-center`} 
+          onClick={handleSyncData}
+          disabled={syncing || !walletAddress}
+        >
+          {syncing ? (
+            <>
+              <i className="fas fa-spinner fa-spin mr-2"></i>
+              Syncing Health Data...
+            </>
+          ) : (
+            <>
+              <i className="fas fa-sync-alt mr-2"></i>
+              Sync Health Data to Solana
+            </>
+          )}
         </button>
       </div>
       
@@ -309,6 +375,15 @@ export default function Home() {
         <ConnectWalletModal 
           onClose={handleCloseConnect} 
           onSuccess={handleConnectSuccess} 
+        />
+      )}
+      
+      {/* Toast Notification */}
+      {toast && (
+        <ToastNotification 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
         />
       )}
       
