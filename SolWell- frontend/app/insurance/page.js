@@ -3,7 +3,9 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import BottomNavigation from '../components/BottomNavigation';
 import { useWallet } from '../contexts/WalletContext';
+import { fetchHealthData } from '../contexts/WalletContext';
 import WalletDropdown from '../components/WalletDropdown';
+import { PublicKey } from '@solana/web3.js';
 
 // CountUp component for number animation
 function CountUp({ end, duration }) {
@@ -35,6 +37,49 @@ function CountUp({ end, duration }) {
   }, [end, duration]);
   
   return count;
+}
+
+// calculate health score
+function calculateHealthScore(healthData) {
+  if (!healthData) return { score: 0, percentile: 0, maxDiscount: 0 };
+  
+  // baseline value
+  const idealSteps = 10000; // ideal daily steps
+  const idealSleep = 8.0;   // ideal sleep time (hours)
+  const idealHeartRate = 65; // ideal heart rate
+  const idealActiveMinutes = 60; // ideal active minutes
+  
+  // calculate the score of each indicator (满分100)
+  const stepsScore = Math.min(100, (healthData.steps / idealSteps) * 100);
+  
+  // sleep score (sleep time between 7-8 hours is best, too much or too little will reduce the score)
+  const sleepScore = Math.max(0, 100 - Math.abs(healthData.sleep - idealSleep) * 20);
+  
+  // heart rate score (the closer to the ideal value, the better)
+  const heartRateScore = Math.max(0, 100 - Math.abs(healthData.heartRate - idealHeartRate));
+  
+  // active minutes score (the closer to the ideal value, the better)
+  const activeMinutesScore = Math.min(100, (healthData.activeMinutes / idealActiveMinutes) * 100);
+  
+  // total score (weighted average)
+  const totalScore = Math.round(
+    stepsScore * 0.3 + 
+    sleepScore * 0.3 + 
+    heartRateScore * 0.2 + 
+    activeMinutesScore * 0.2
+  );
+  
+  // percentile (simulated calculation, should be based on all user data)
+  const percentile = Math.min(99, Math.round(totalScore * 0.9 + Math.random() * 10));
+  
+  // maximum discount (calculated based on health score)
+  const maxDiscount = Math.round(totalScore / 3);
+  
+  return {
+    score: totalScore,
+    percentile: percentile,
+    maxDiscount: maxDiscount
+  };
 }
 
 // Mock API data
@@ -117,6 +162,23 @@ export default function Insurance() {
   const [animated, setAnimated] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  const [healthData, setHealthData] = useState(null);
+  
+  // 获取健康数据
+  useEffect(() => {
+    const getHealthData = async () => {
+      if (!walletAddress) return;
+      
+      try {
+        const fetchedHealthData = await fetchHealthData(new PublicKey(walletAddress), 'Week');
+        setHealthData(fetchedHealthData);
+      } catch (err) {
+        console.error("Error fetching health data:", err);
+      }
+    };
+    
+    getHealthData();
+  }, [walletAddress]);
   
   // Simulate API fetch
   useEffect(() => {
@@ -127,8 +189,36 @@ export default function Insurance() {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 1200));
         
-        // Simulate successful API response
-        const response = MOCK_API_DATA;
+        // get health score
+        const healthScore = healthData ? calculateHealthScore(healthData) : MOCK_API_DATA.userHealth;
+        
+        // Simulate successful API response with calculated health score
+        const response = {
+          ...MOCK_API_DATA,
+          userHealth: healthScore
+        };
+        
+        // update the tag and price of insurance products
+        response.insuranceProducts = response.insuranceProducts.map(product => {
+          const discount = product.id === 1 ? healthScore.maxDiscount * 0.5 : 
+                          product.id === 2 ? healthScore.maxDiscount * 0.67 : 0;
+          
+          if (discount > 0 && product.price.original) {
+            const discountedPrice = (parseFloat(product.price.original) * (1 - discount / 100)).toFixed(2);
+            return {
+              ...product,
+              tag: {
+                ...product.tag,
+                text: `Based on your health score, you get a ${Math.round(discount)}% discount`
+              },
+              price: {
+                ...product.price,
+                current: discountedPrice
+              }
+            };
+          }
+          return product;
+        });
         
         // 5% chance of error for testing error handling
         if (Math.random() < 0.05) {
@@ -158,7 +248,7 @@ export default function Insurance() {
       setData(null);
       setAnimated(false);
     };
-  }, []);
+  }, [healthData]);
   
   // Handle retry on error
   const handleRetry = () => {
@@ -166,9 +256,15 @@ export default function Insurance() {
     setAnimated(false);
     setLoading(true);
     
-    // Simulate new request
+    // get health score
+    const healthScore = healthData ? calculateHealthScore(healthData) : MOCK_API_DATA.userHealth;
+    
+    // Simulate new request with calculated health score
     setTimeout(() => {
-      setData(MOCK_API_DATA);
+      setData({
+        ...MOCK_API_DATA,
+        userHealth: healthScore
+      });
       setLoading(false);
       setTimeout(() => setAnimated(true), 100);
     }, 1000);
