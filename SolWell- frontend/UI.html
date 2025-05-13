@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SolWell - Health Management + Insurance DApp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .phone-frame {
+      width: 375px;
+      height: 812px;
+      border: 2px solid #e2e2e2;
+      border-radius: 40px;
+      overflow: hidden;
+      position: relative;
+      background-color: white;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .app-content {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .app-content::-webkit-scrollbar {
+      display: none;
+    }
+    body {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 2rem;
+      padding: 2rem;
+      min-height: 100vh;
+      background-color: #f9fafb;
+      justify-content: flex-start;
+      align-items: center;
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #9945FF, #14F195);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #9945FF, #14F195);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="flex flex-col min-h-screen bg-gray-50 pb-20">
+    <!-- Home/Data Dashboard -->
+    <div class="phone-frame">
+      <div class="app-content">
+        <div class="flex flex-col h-full">
+          <!-- Top Navigation -->
+          <div class="p-6 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-black">SolWell</h1>
+            <button class="rounded-full bg-purple-100 p-2">
+              <i class="fas fa-wallet text-black"></i>
+            </button>
+          </div>
+          
+          <!-- Health Data Overview -->
+          <div class="px-6">
+            <div class="rounded-xl bg-gradient-to-r from-purple-500 to-green-400 p-4 text-white">
+              <div class="flex justify-between items-center mb-2">
+                <h2 class="font-bold">Today's Health Overview</h2>
+                <span class="text-xs">October 12, 2023</span>
+              </div>
+              <div class="grid grid-cols-2 gap-3 mt-3">
+                <div class="bg-white/20 rounded-lg p-3">
+                  <div class="flex items-center">
+                    <i class="fas fa-shoe-prints mr-2"></i>
+                    <span>Steps</span>
+                  </div>
+                  <p class="text-xl font-bold mt-1">8,456</p>
+                </div>
+                <div class="bg-white/20 rounded-lg p-3">
+                  <div class="flex items-center">
+                    <i class="fas fa-moon mr-2"></i>
+                    <span>Sleep</span>
+                  </div>
+                  <p class="text-xl font-bold mt-1">7.3 hours</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Time Filter -->
+          <div class="px-6 mt-6">
+            <div class="flex space-x-2 text-sm">
+              <button class="px-3 py-1 rounded-full bg-purple-500 text-white">7 Days</button>
+              <button class="px-3 py-1 rounded-full bg-gray-200 text-black">30 Days</button>
+              <button class="px-3 py-1 rounded-full bg-gray-200 text-black">365 Days</button>
+              <button class="px-3 py-1 rounded-full bg-gray-200 text-black">All</button>
+            </div>
+          </div>
+          
+          <!-- Detailed Health Data -->
+          <div class="px-6 mt-6">
+            <h3 class="font-bold text-black mb-3">Health Details</h3>
+            <div class="bg-gray-50 rounded-xl p-4 mb-4">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="flex items-center">
+                    <i class="fas fa-heart text-purple-500 mr-2"></i>
+                    <span class="text-black font-medium">Heart Rate</span>
+                  </div>
+                  <p class="text-black font-bold text-xl">72 <span class="text-xs font-normal">bpm</span></p>
+                </div>
+                <div class="w-24 h-12 bg-gray-100 rounded flex items-end">
+                  <div class="w-3 h-4 bg-purple-300 rounded-t mx-0.5"></div>
+                  <div class="w-3 h-6 bg-purple-400 rounded-t mx-0.5"></div>
+                  <div class="w-3 h-8 bg-purple-500 rounded-t mx-0.5"></div>
+                  <div class="w-3 h-5 bg-purple-400 rounded-t mx-0.5"></div>
+                  <div class="w-3 h-7 bg-purple-500 rounded-t mx-0.5"></div>
+                  <div class="w-3 h-6 bg-purple-400 rounded-t mx-0.5"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-gray-50 rounded-xl p-4 mb-4">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="flex items-center">
+                    <i class="fas fa-fire text-purple-500 mr-2"></i>
+                    <span class="text-black font-medium">Calories</span>
+                  </div>
+                  <p class="text-black font-bold text-xl">342 <span class="text-xs font-normal">kcal</span></p>
+                </div>
+                <div class="w-24 h-12 bg-gray-100 rounded flex justify-center items-center">
+                  <div class="w-20 h-8 relative">
+                    <svg viewBox="0 0 80 32" class="w-full h-full">
+                      <path d="M0,32 C10,28 20,16 30,22 C40,28 50,10 60,14 C70,18 80,24 80,32" fill="none" stroke="#9333ea" stroke-width="2"></path>
+                    </svg>
+                    <div class="absolute right-0 bottom-0 w-2 h-2 bg-purple-500 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-gray-50 rounded-xl p-4">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="flex items-center">
+                    <i class="fas fa-running text-purple-500 mr-2"></i>
+                    <span class="text-black font-medium">Activity Time</span>
+                  </div>
+                  <p class="text-black font-bold text-xl">45 <span class="text-xs font-normal">minutes</span></p>
+                </div>
+                <div class="w-24 h-12 bg-gray-100 rounded flex items-center justify-center">
+                  <div class="w-16 h-8 rounded-full bg-gray-200 relative">
+                    <div class="absolute inset-0 rounded-full overflow-hidden">
+                      <div class="bg-gradient-to-r from-purple-400 to-green-300 h-full" style="width: 75%"></div>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <span class="text-xs text-black font-medium">75%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Sync Button -->
+          <div class="px-6 mt-6">
+            <button class="w-full py-3 bg-black text-white rounded-xl font-medium flex items-center justify-center">
+              <i class="fas fa-sync-alt mr-2"></i>
+              Sync Health Data to Solana
+            </button>
+          </div>
+          
+          <!-- Bottom Navigation -->
+          <div class="mt-auto p-6">
+            <div class="flex justify-around">
+              <div class="flex flex-col items-center">
+                <div class="p-2 bg-purple-100 rounded-full">
+                  <i class="fas fa-home text-black"></i>
+                </div>
+                <span class="text-xs mt-1 text-black">Home</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="p-2 rounded-full">
+                  <i class="fas fa-shield-alt text-black"></i>
+                </div>
+                <span class="text-xs mt-1 text-black">Insurance</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="p-2 rounded-full">
+                  <i class="fas fa-user text-black"></i>
+                </div>
+                <span class="text-xs mt-1 text-black">Profile</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Insurance Page -->
+    <div class="phone-frame">
+      <div class="app-content">
+        <div class="flex flex-col h-full">
+          <!-- Top Navigation -->
+          <div class="p-6 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-black">Insurance</h1>
+            <button class="rounded-full bg-purple-100 p-2">
+              <i class="fas fa-wallet text-black"></i>
+            </button>
+          </div>
+          
+          <!-- Health Score -->
+          <div class="px-6">
+            <div class="bg-gray-50 rounded-xl p-6">
+              <h3 class="text-black font-bold mb-2">Your Health Score</h3>
+              <div class="flex items-center justify-between">
+                <div class="text-4xl font-bold gradient-text">85</div>
+                <div class="w-24 h-24 rounded-full border-8 border-purple-500 flex items-center justify-center">
+                  <span class="text-black font-bold text-2xl">85%</span>
+                </div>
+              </div>
+              <p class="mt-2 text-black text-sm">Based on your health data, your health condition is better than 78% of users</p>
+              <div class="mt-3 bg-purple-50 rounded-lg p-2.5">
+                <p class="text-black text-sm">Congratulations! High health score can enjoy <span class="font-bold">up to 30%</span> premium discount</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Recommended Insurance Products -->
+          <div class="px-6 mt-6">
+            <h3 class="text-black font-bold mb-3">Recommended Insurance Products</h3>
+            
+            <div class="bg-white border border-gray-100 rounded-xl p-4 mb-4 shadow-sm relative overflow-hidden">
+              <div class="absolute -right-2 -top-2 transform rotate-45 bg-purple-500 text-white text-xs px-6 py-1">Recommended</div>
+              <div class="flex items-start">
+                <div class="bg-purple-100 p-3 rounded-xl mr-3">
+                  <i class="fas fa-heartbeat text-purple-500"></i>
+                </div>
+                <div class="flex-1">
+                  <h4 class="text-black font-bold">Health Select Insurance</h4>
+                  <p class="text-xs text-black mt-1">Customized for users in good health, providing comprehensive coverage</p>
+                  <div class="mt-2 bg-green-50 rounded p-1.5 flex items-center">
+                    <i class="fas fa-tag text-green-500 mr-1.5 text-xs"></i>
+                    <span class="text-xs text-black">Based on your health score, you get a 15% discount</span>
+                  </div>
+                  <div class="flex justify-between mt-3 items-end">
+                    <div>
+                      <span class="text-xs text-black">Monthly Premium</span>
+                      <div class="flex items-end">
+                        <p class="text-black font-bold">0.25 SOL</p>
+                        <span class="text-xs line-through text-gray-400 ml-1">0.30 SOL</span>
+                      </div>
+                    </div>
+                    <button class="px-4 py-2 bg-black text-white rounded-lg text-sm">Purchase Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white border border-gray-100 rounded-xl p-4 mb-4 shadow-sm">
+              <div class="flex items-start">
+                <div class="bg-green-100 p-3 rounded-xl mr-3">
+                  <i class="fas fa-running text-green-500"></i>
+                </div>
+                <div class="flex-1">
+                  <h4 class="text-black font-bold">Sports Protection Plan</h4>
+                  <p class="text-xs text-black mt-1">Provides accident and medical coverage for users who exercise regularly</p>
+                  <div class="mt-2 bg-green-50 rounded p-1.5 flex items-center">
+                    <i class="fas fa-tag text-green-500 mr-1.5 text-xs"></i>
+                    <span class="text-xs text-black">Your exercise habits are good, enjoy 20% discount</span>
+                  </div>
+                  <div class="flex justify-between mt-3 items-end">
+                    <div>
+                      <span class="text-xs text-black">Monthly Premium</span>
+                      <div class="flex items-end">
+                        <p class="text-black font-bold">0.18 SOL</p>
+                        <span class="text-xs line-through text-gray-400 ml-1">0.22 SOL</span>
+                      </div>
+                    </div>
+                    <button class="px-4 py-2 bg-black text-white rounded-lg text-sm">Purchase Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+              <div class="flex items-start">
+                <div class="bg-blue-100 p-3 rounded-xl mr-3">
+                  <i class="fas fa-hospital text-blue-500"></i>
+                </div>
+                <div class="flex-1">
+                  <h4 class="text-black font-bold">Comprehensive Medical Protection</h4>
+                  <p class="text-xs text-black mt-1">Coverage for hospitalization, outpatient care, and special disease treatment</p>
+                  <div class="mt-2 bg-yellow-50 rounded p-1.5 flex items-center">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-1.5 text-xs"></i>
+                    <span class="text-xs text-black">Increase daily sleep time to get more discounts</span>
+                  </div>
+                  <div class="flex justify-between mt-3 items-end">
+                    <div>
+                      <span class="text-xs text-black">Monthly Premium</span>
+                      <p class="text-black font-bold">0.35 SOL</p>
+                    </div>
+                    <button class="px-4 py-2 bg-black text-white rounded-lg text-sm">Purchase Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Health Tips -->
+          <div class="px-6 mt-6">
+            <div class="bg-purple-50 p-4 rounded-xl">
+              <h4 class="text-black font-medium mb-2">Health Tips</h4>
+              <p class="text-black text-sm">Your current health condition is excellent! Keep it up to enjoy more premium discounts.</p>
+              <div class="mt-3 space-y-2">
+                <div class="flex items-start">
+                  <div class="min-w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center mr-2 mt-0.5">
+                    <i class="fas fa-check text-purple-500 text-xs"></i>
+                  </div>
+                  <p class="text-black text-xs">Add 30 minutes of moderate to high intensity exercise per week to improve health score</p>
+                </div>
+                <div class="flex items-start">
+                  <div class="min-w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center mr-2 mt-0.5">
+                    <i class="fas fa-check text-purple-500 text-xs"></i>
+                  </div>
+                  <p class="text-black text-xs">Maintain 7-8 hours of quality sleep to improve health score by up to 10%</p>
+                </div>
+                <div class="flex items-start">
+                  <div class="min-w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center mr-2 mt-0.5">
+                    <i class="fas fa-check text-purple-500 text-xs"></i>
+                  </div>
+                  <p class="text-black text-xs">Apply for insurance now to lock in current discounts, health status changes won't affect premiums</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Bottom Navigation -->
+          <div class="mt-auto p-6">
+            <div class="flex justify-around">
+              <div class="flex flex-col items-center">
+                <div class="p-2 rounded-full">
+                  <i class="fas fa-home text-black"></i>
+                </div>
+                <span class="text-xs mt-1 text-black">Home</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="p-2 bg-purple-100 rounded-full">
+                  <i class="fas fa-shield-alt text-black"></i>
+                </div>
+                <span class="text-xs mt-1 text-black">Insurance</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="p-2 rounded-full">
+                  <i class="fas fa-user text-black"></i>
+                </div>
+                <span class="text-xs mt-1 text-black">Profile</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Connect Wallet Page -->
+    <div class="phone-frame">
+      <div class="app-content">
+        <div class="flex flex-col h-full">
+          <div class="p-6">
+            <div class="flex justify-between items-center">
+              <h1 class="text-2xl font-bold text-black">Connect Wallet</h1>
+              <button class="w-8 h-8 flex items-center justify-center">
+                <i class="fas fa-times text-black"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="px-6 py-10 flex-1 flex flex-col items-center justify-center">
+            <div class="w-24 h-24 rounded-full gradient-bg flex items-center justify-center mb-6">
+              <i class="fas fa-wallet text-white text-3xl"></i>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-black">Connect Your Wallet</h2>
+            <p class="text-black text-center mt-2 mb-8">Connect your Solana wallet to sync health data and access insurance services</p>
+            
+            <div class="w-full space-y-4">
+              <button class="w-full py-4 bg-black text-white rounded-xl font-medium flex items-center justify-center">
+                <div class="w-5 h-5 bg-white rounded-full flex items-center justify-center mr-2">
+                  <i class="fas fa-ghost text-purple-600 text-xs"></i>
+                </div>
+                Phantom Wallet
+              </button>
+              
+              <button class="w-full py-4 bg-white border border-gray-200 text-black rounded-xl font-medium flex items-center justify-center">
+                <div class="w-5 h-5 rounded-full gradient-bg flex items-center justify-center mr-2">
+                  <i class="fas fa-wallet text-white text-xs"></i>
+                </div>
+                Sollet Wallet
+              </button>
+              
+              <button class="w-full py-4 bg-white border border-gray-200 text-black rounded-xl font-medium flex items-center justify-center">
+                <div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center mr-2">
+                  <i class="fas fa-sun text-white text-xs"></i>
+                </div>
+                Solflare Wallet
+              </button>
+            </div>
+          </div>
+          
+          <div class="p-6">
+            <p class="text-xs text-black text-center">By connecting your wallet, you agree to SolWell's Terms of Service and Privacy Policy</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Profile Page -->
+    <div class="phone-frame">
+      <div class="app-content">
+        <div class="flex flex-col h-full">
+          <!-- Top Navigation -->
+          <div class="p-6 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-black">Profile</h1>
+            <button class="rounded-full bg-gray-100 p-2">
+              <i class="fas fa-cog text-black"></i>
+            </button>
+          </div>
+          
+          <!-- User Info -->
+          <div class="px-6">
+            <div class="flex items-center">
+              <div class="w-20 h-20 rounded-full gradient-bg flex items-center justify-center mr-4">
+                <i class="fas fa-user text-white text-2xl"></i>
+              </div>
+              <div>
+                <h2 class="text-black font-bold text-xl">Alex Wang</h2>
+                <div class="flex items-center mt-1">
+                  <div class="bg-gray-100 rounded-full px-2 py-1 text-xs text-black mr-2 flex items-center">
+                    <i class="fas fa-wallet text-purple-500 mr-1 text-xs"></i>
+                    Connected
+                  </div>
+                  <p class="text-black text-xs">Sol...45dF</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Data Statistics -->
+          <div class="px-6 mt-6">
+            <div class="bg-gray-50 rounded-xl p-4">
+              <div class="grid grid-cols-3 gap-2">
+                <div class="text-center">
+                  <p class="text-black text-sm">Health Score</p>
+                  <p class="text-black font-bold text-xl mt-1">85</p>
+                </div>
+                <div class="text-center border-l border-r border-gray-200">
+                  <p class="text-black text-sm">Insurance Assets</p>
+                  <p class="text-black font-bold text-xl mt-1">2.5 SOL</p>
+                </div>
+                <div class="text-center">
+                  <p class="text-black text-sm">Healthy Days</p>
+                  <p class="text-black font-bold text-xl mt-1">156</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Feature Menu -->
+          <div class="px-6 mt-6">
+            <h3 class="text-black font-bold mb-3">My Services</h3>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div class="p-4 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                    <i class="fas fa-file-contract text-purple-500"></i>
+                  </div>
+                  <span class="text-black">My Policies</span>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+              </div>
+              
+              <div class="p-4 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                    <i class="fas fa-heartbeat text-green-500"></i>
+                  </div>
+                  <span class="text-black">Health Records</span>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+              </div>
+              
+              <div class="p-4 flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                    <i class="fas fa-coins text-blue-500"></i>
+                  </div>
+                  <span class="text-black">Transaction History</span>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+              </div>
+            </div>
+          </div>
+          
+          <!-- System Settings -->
+          <div class="px-6 mt-6">
+            <h3 class="text-black font-bold mb-3">System Settings</h3>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div class="p-4 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+                    <i class="fas fa-bell text-gray-500"></i>
+                  </div>
+                  <span class="text-black">Notifications</span>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+              </div>
+              
+              <div class="p-4 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+                    <i class="fas fa-shield-alt text-gray-500"></i>
+                  </div>
+                  <span class="text-black">Privacy Settings</span>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+              </div>
+              
+              <div class="p-4 flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+                    <i class="fas fa-question-circle text-gray-500"></i>
+                  </div>
+                  <span class="text-black">Help Center</span>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Bottom Navigation -->
+          <div class="mt-auto p-6">
+            <div class="flex justify-around">
+              <div class="flex flex-col items-center">
+                <div class="p-2 rounded-full">
+                  <i class="fas fa-home text-black"></i>
+                </div>
+                <span class="text-xs mt-1 text-black">Home</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="p-2 rounded-full">
+                  <i class="fas fa-shield-alt text-black"></i>
+                </div>
+                <span class="text-xs mt-1 text-black">Insurance</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="p-2 bg-purple-100 rounded-full">
+                  <i class="fas fa-user text-black"></i>
+                </div>
+                <span class="text-xs mt-1 text-black">Profile</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-sol_well_contracts = "ESrVTzUZSTro7K5j3eibWLX4mzxPHN2JHnNW4gCSidUr"
+insurance_contract = "J6pC1jbqJFSAfai5ociJQzCUg6uspv62FcnRNV7R1stE"
 
 [registry]
 url = "https://api.apr.dev"

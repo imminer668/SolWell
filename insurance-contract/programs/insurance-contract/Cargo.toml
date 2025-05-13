@@ -1,12 +1,12 @@
 [package]
-name = "sol-well-contracts"
+name = "insurance-contract"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "sol_well_contracts"
+name = "insurance_contract"
 
 [features]
 default = []
@@ -18,5 +18,5 @@ idl-build = ["anchor-lang/idl-build"]
 
 
 [dependencies]
-anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
+anchor-lang = "0.31.1"
 
